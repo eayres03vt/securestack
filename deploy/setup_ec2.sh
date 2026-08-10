@@ -16,7 +16,7 @@ sudo dnf install -y git python3-pip python3-devel gcc
 
 echo "Cloning repository..."
 sudo mkdir -p /opt/securestack
-sudo chown ec2-user:ec2-user /opt/securestack
+sudo chown ssm-user:ssm-user /opt/securestack
 cd /opt/securestack
 git clone https://github.com/eayres03vt/securestack.git .
 

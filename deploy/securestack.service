@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=ec2-user
+User=ssm-user
 WorkingDirectory=/opt/securestack/app
 EnvironmentFile=/opt/securestack/app/.env.production
 ExecStart=/opt/securestack/app/venv/bin/gunicorn --bind 0.0.0.0:80 --workers 2 app:app
