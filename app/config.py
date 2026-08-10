@@ -9,7 +9,8 @@ def _get_db_password_from_ssm(project_name: str) -> str:
     ssm:GetParameter on this one parameter and nothing else)."""
     import boto3
 
-    ssm = boto3.client("ssm")
+    region = os.environ.get("AWS_REGION", "us-east-1")
+    ssm = boto3.client("ssm", region_name=region)
     response = ssm.get_parameter(
         Name=f"/{project_name}/db_password", WithDecryption=True
     )

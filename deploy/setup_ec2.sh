@@ -32,6 +32,7 @@ DB_HOST=$DB_HOST
 DB_NAME=securestack
 DB_USER=dbadmin
 PROJECT_NAME=securestack
+AWS_REGION=us-east-1
 EOF
 
 echo "Installing systemd service..."
