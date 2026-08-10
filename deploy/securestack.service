@@ -1,0 +1,22 @@
+[Unit]
+Description=SecureStack Inventory App
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/securestack/app
+EnvironmentFile=/opt/securestack/app/.env.production
+ExecStart=/opt/securestack/app/venv/bin/gunicorn --bind 0.0.0.0:80 --workers 2 app:app
+Restart=on-failure
+
+# Binding to port 80 normally requires root. Instead of running the
+# whole app as root (which would be excessive - "least privilege"
+# again), we grant just the one specific capability needed to bind a
+# low port, while the app process itself still runs as the unprivileged
+# ec2-user.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

@@ -21,3 +21,12 @@ terraform.rc
 
 # OS
 .DS_Store
+
+# Python / Flask app
+app/venv/
+app/__pycache__/
+app/**/__pycache__/
+app/instance/
+app/*.db
+app/.env
+

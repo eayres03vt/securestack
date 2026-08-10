@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Item</h2>
+<form method="post">
+  <div class="field"><label>Name</label><input name="name" value="{{ item.name }}" required></div>
+  <div class="field"><label>SKU</label><input name="sku" value="{{ item.sku }}" required></div>
+  <div class="field"><label>Category</label><input name="category" value="{{ item.category or '' }}"></div>
+  <div class="field"><label>Quantity</label><input name="quantity" type="number" value="{{ item.quantity }}"></div>
+  <div class="field"><label>Location</label><input name="location" value="{{ item.location or '' }}"></div>
+  <button type="submit">Save</button>
+  <a class="button secondary" href="{{ url_for('index') }}">Cancel</a>
+</form>
+{% endblock %}

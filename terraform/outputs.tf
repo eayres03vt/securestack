@@ -16,3 +16,18 @@ output "private_subnet_ids" {
   description = "IDs of the private subnets"
   value       = aws_subnet.private[*].id
 }
+
+output "app_server_public_ip" {
+  description = "Public IP of the EC2 app server - use this to view the app in a browser"
+  value       = aws_instance.app.public_ip
+}
+
+output "app_server_instance_id" {
+  description = "Instance ID - needed to start an SSM session"
+  value       = aws_instance.app.id
+}
+
+output "db_endpoint" {
+  description = "RDS connection endpoint (host:port)"
+  value       = aws_db_instance.main.endpoint
+}
