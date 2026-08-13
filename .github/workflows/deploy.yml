@@ -31,7 +31,7 @@ jobs:
           directory: terraform
           quiet: true
           soft_fail: false
-          skip_check: CKV_AWS_126,CKV_AWS_157,CKV_AWS_118,CKV_AWS_337,CKV_AWS_260,CKV_AWS_382,CKV_AWS_130,CKV_AWS_293,CKV2_AWS_11,CKV2_AWS_30
+          skip_check: CKV_AWS_126,CKV_AWS_157,CKV_AWS_118,CKV_AWS_337,CKV_AWS_354,CKV_AWS_260,CKV_AWS_382,CKV_AWS_130,CKV_AWS_293,CKV2_AWS_11,CKV2_AWS_30
 
       # Scans the app's Python dependencies for known vulnerabilities
       # (CVEs) in the exact package versions in requirements.txt.

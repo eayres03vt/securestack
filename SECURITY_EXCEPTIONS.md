@@ -10,6 +10,7 @@ The CI/CD pipeline runs [Checkov](https://www.checkov.io/) against the Terraform
 | CKV_AWS_157 | RDS Multi-AZ | Roughly doubles RDS cost by running a live standby; not justified for a single-user demo environment |
 | CKV_AWS_118 | RDS Enhanced Monitoring | Additional CloudWatch cost and complexity beyond what Performance Insights (already enabled) provides |
 | CKV_AWS_337 | Customer-managed KMS key for SSM parameters | ~$1/month per key; the default AWS-managed key still provides encryption at rest, just without customer key rotation control |
+| CKV_AWS_354 | Customer-managed KMS key for RDS Performance Insights | Same reasoning as above - the data is still encrypted by default, just with an AWS-managed key instead of a customer-managed one |
 
 ## Intentional design decisions
 
