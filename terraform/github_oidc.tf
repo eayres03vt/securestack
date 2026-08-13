@@ -1,13 +1,21 @@
+# Fetches GitHub's current TLS certificate live at apply time, instead
+# of a hardcoded thumbprint that goes stale whenever GitHub rotates
+# their signing certificate (which is exactly what broke this the
+# first time - the hardcoded value was already out of date).
+data "tls_certificate" "github" {
+  url = "https://token.actions.githubusercontent.com"
+}
+
 # ============================================================
 # Tells AWS to trust GitHub Actions as an identity provider.
 # GitHub issues a short-lived, cryptographically signed token for
-# each workflow run; AWS verifies it against GitHub's public keys
-# (the thumbprint below) instead of a stored secret.
+# each workflow run; AWS verifies it against GitHub's actual current
+# certificate thumbprint, fetched dynamically above.
 # ============================================================
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+  thumbprint_list = [data.tls_certificate.github.certificates[0].sha1_fingerprint]
 }
 
 # ============================================================
@@ -32,8 +40,13 @@ resource "aws_iam_role" "github_actions" {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
+          # GitHub's actual sub claim includes immutable numeric owner/repo
+          # IDs (confirmed via CloudTrail), not just the plain name - e.g.
+          # "repo:eayres03vt@313114895/securestack@1323294435:ref:...".
+          # This still scopes access to exactly this repo; the numeric IDs
+          # stay valid even if the repo or account is ever renamed.
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:eayres03vt/securestack:*"
+            "token.actions.githubusercontent.com:sub" = "repo:eayres03vt@313114895/securestack@1323294435:*"
           }
         }
       }
