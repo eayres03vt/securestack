@@ -70,6 +70,15 @@ resource "aws_iam_role_policy" "github_actions_deploy" {
         Effect   = "Allow"
         Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"]
         Resource = "*"
+      },
+      {
+        # Lets the pipeline look up the current instance ID by tag at
+        # runtime, instead of it being hardcoded in the workflow file -
+        # so if the instance is ever replaced, the pipeline keeps working
+        # without needing a manual update.
+        Effect   = "Allow"
+        Action   = "ec2:DescribeInstances"
+        Resource = "*"
       }
     ]
   })

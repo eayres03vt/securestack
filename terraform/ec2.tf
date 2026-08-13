@@ -25,6 +25,20 @@ resource "aws_instance" "app" {
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.app.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
+  ebs_optimized          = true
+
+  # Requires IMDSv2 (a hardened version of the metadata service that's
+  # resistant to SSRF-based credential theft) instead of allowing the
+  # older, less secure IMDSv1. Free, no reason not to.
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  # Encrypts the server's root disk at rest. Free, no performance cost.
+  root_block_device {
+    encrypted = true
+  }
 
   tags = {
     Name = "${var.project_name}-app-server"

@@ -17,6 +17,17 @@ resource "aws_vpc" "main" {
 # nothing in the VPC can reach or be reached from the internet,
 # no matter what else is configured.
 # ============================================================
+
+# Every VPC gets an unused "default" security group automatically.
+# Nothing in this project actually uses it (everything explicitly
+# uses app-sg or db-sg), but best practice is to strip its rules
+# anyway so it can never accidentally become a backdoor if someone
+# attaches a resource to it later without thinking.
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+  # No ingress or egress rules defined = denies all traffic.
+}
+
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 

@@ -45,6 +45,13 @@ resource "aws_db_instance" "main" {
   backup_retention_period = 1
   skip_final_snapshot     = true
 
+  # All free, zero-tradeoff hardening:
+  auto_minor_version_upgrade     = true # picks up security patches automatically
+  copy_tags_to_snapshot          = true
+  performance_insights_enabled   = true # free for 7-day retention on this instance class
+  iam_database_authentication_enabled = true # makes IAM-based DB auth available as an option
+  enabled_cloudwatch_logs_exports = ["postgresql"] # ships DB logs to CloudWatch
+
   tags = {
     Name = "${var.project_name}-db"
   }
