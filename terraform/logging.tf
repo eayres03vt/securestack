@@ -30,6 +30,30 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
   }
 }
 
+# Automatically moves old logs to cheaper storage, then deletes them
+# after a year - keeps a full year of audit history available (useful
+# for any investigation) without the bucket growing and costing more
+# indefinitely.
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "archive-and-expire"
+    status = "Enabled"
+
+    filter {} # applies to every object in the bucket
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "logs" {
   bucket                  = aws_s3_bucket.logs.id
   block_public_acls       = true
@@ -83,6 +107,29 @@ resource "aws_s3_bucket_policy" "logs" {
   })
 }
 
+# SNS topic CloudTrail notifies whenever a new log file is delivered.
+# Also gives us a ready-made hook to wire up email alerts on later
+# (e.g. GuardDuty findings) without adding new infrastructure then.
+resource "aws_sns_topic" "cloudtrail" {
+  name = "${var.project_name}-cloudtrail-notifications"
+}
+
+resource "aws_sns_topic_policy" "cloudtrail" {
+  arn = aws_sns_topic.cloudtrail.arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AWSCloudTrailSNSPolicy"
+        Effect    = "Allow"
+        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Action    = "SNS:Publish"
+        Resource  = aws_sns_topic.cloudtrail.arn
+      }
+    ]
+  })
+}
+
 # ============================================================
 # CloudTrail - records every API call made in this AWS account:
 # who did it, when, from where, and what they did. This is the
@@ -97,8 +144,9 @@ resource "aws_cloudtrail" "main" {
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_log_file_validation    = true # detects if log files are tampered with
+  sns_topic_name                = aws_sns_topic.cloudtrail.name
 
-  depends_on = [aws_s3_bucket_policy.logs]
+  depends_on = [aws_s3_bucket_policy.logs, aws_sns_topic_policy.cloudtrail]
 
   tags = {
     Name = "${var.project_name}-trail"

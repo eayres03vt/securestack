@@ -16,6 +16,15 @@ resource "aws_db_parameter_group" "main" {
     value = "1"
   }
 
+  # Forces connections to the database to use SSL/TLS - encryption in
+  # transit, not just at rest. Free to enable. The app's connection
+  # string needs to request SSL too (see config.py) or the connection
+  # will simply be rejected.
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
+
   tags = {
     Name = "${var.project_name}-postgres-params"
   }

@@ -32,7 +32,9 @@ def _build_database_uri() -> str:
     project_name = os.environ.get("PROJECT_NAME", "securestack")
     password = _get_db_password_from_ssm(project_name)
 
-    return f"postgresql+psycopg2://{db_user}:{password}@{db_host}/{db_name}"
+    # sslmode=require matches the rds.force_ssl=1 setting on the database
+    # side - the connection is encrypted in transit, not just at rest.
+    return f"postgresql+psycopg2://{db_user}:{password}@{db_host}/{db_name}?sslmode=require"
 
 
 class Config:
