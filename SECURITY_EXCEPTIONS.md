@@ -21,13 +21,6 @@ The CI/CD pipeline runs [Checkov](https://www.checkov.io/) against the Terraform
 | CKV_AWS_130 (x2) | Subnets should not auto-assign public IPs | Public subnets are specifically the tier meant to be internet-reachable in this two-tier architecture; this is the intended behavior, not an oversight |
 | CKV_AWS_293 | RDS deletion protection | Intentionally disabled so `terraform destroy` can fully tear down the environment during development to control cost between work sessions. Would be enabled in a real production deployment |
 
-## Deferred to Phase 4 (Monitoring)
-
-| Check | What it wants | Status |
-|---|---|---|
-| CKV2_AWS_11 | VPC Flow Logs enabled | Being implemented as part of the dedicated monitoring/logging phase, alongside CloudTrail and GuardDuty, rather than bolted on piecemeal |
-| CKV2_AWS_30 | RDS query logging (Postgres) | Requires a custom DB parameter group; scheduled alongside the rest of the logging/monitoring buildout |
-
 ## Fixed (not excluded)
 
-Everything else Checkov originally flagged was fixed directly in the Terraform code: EBS encryption, EBS optimization, IMDSv2 enforcement, security group rule descriptions, RDS auto minor-version upgrades, RDS Performance Insights, RDS IAM authentication support, RDS CloudWatch log export, and locking down the VPC's default security group.
+Everything else Checkov originally flagged was fixed directly in the Terraform code: EBS encryption, EBS optimization, IMDSv2 enforcement, security group rule descriptions, RDS auto minor-version upgrades, RDS Performance Insights, RDS IAM authentication support, RDS CloudWatch log export, locking down the VPC's default security group, VPC Flow Logs (CKV2_AWS_11, added in Phase 4 alongside CloudTrail/GuardDuty), and RDS query logging via a custom parameter group (CKV2_AWS_30, added in Phase 4).
