@@ -54,9 +54,9 @@ GitHub Actions: on push, run tests, run security scans (Checkov for Terraform mi
 Everything is scoped to stay within AWS free tier limits. I'll flag any resource before we create it if it risks a charge, and we'll tear down anything left running when you're not actively demoing it.
 
 ## Status
-- [ ] Phase 0 — Accounts
-- [ ] Phase 1 — IaC
-- [ ] Phase 2 — App
-- [ ] Phase 3 — CI/CD
-- [ ] Phase 4 — Monitoring
-- [ ] Phase 5 — Docs
+- [x] Phase 0 — Accounts
+- [x] Phase 1 — IaC
+- [x] Phase 2 — App
+- [x] Phase 3 — CI/CD
+- [x] Phase 4 — Monitoring
+- [ ] Phase 5 — Docs (README + IR runbook done, diagram embedded in README — remaining: demo video)
