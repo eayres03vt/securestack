@@ -51,6 +51,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     expiration {
       days = 365
     }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
   }
 }
 
@@ -111,7 +115,8 @@ resource "aws_s3_bucket_policy" "logs" {
 # Also gives us a ready-made hook to wire up email alerts on later
 # (e.g. GuardDuty findings) without adding new infrastructure then.
 resource "aws_sns_topic" "cloudtrail" {
-  name = "${var.project_name}-cloudtrail-notifications"
+  name              = "${var.project_name}-cloudtrail-notifications"
+  kms_master_key_id = "alias/aws/sns" # AWS-managed key, free to enable
 }
 
 resource "aws_sns_topic_policy" "cloudtrail" {

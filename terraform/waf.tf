@@ -13,6 +13,10 @@ resource "aws_lb" "main" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = aws_subnet.public[*].id
 
+  # Strips malformed/invalid HTTP headers before they reach the app -
+  # free, no downside for a normal web app.
+  drop_invalid_header_fields = true
+
   tags = {
     Name = "${var.project_name}-alb"
   }
@@ -156,4 +160,22 @@ resource "aws_wafv2_web_acl" "main" {
 resource "aws_wafv2_web_acl_association" "main" {
   resource_arn = aws_lb.main.arn
   web_acl_arn  = aws_wafv2_web_acl.main.arn
+}
+
+# WAF logging - the name MUST start with "aws-waf-logs-", an AWS
+# requirement for this specific integration. Logs every request WAF
+# evaluates (allowed and blocked) so blocks are actually visible and
+# investigable, not just happening silently.
+resource "aws_cloudwatch_log_group" "waf" {
+  name              = "aws-waf-logs-${var.project_name}"
+  retention_in_days = 30
+
+  tags = {
+    Name = "${var.project_name}-waf-logs"
+  }
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "main" {
+  resource_arn            = aws_wafv2_web_acl.main.arn
+  log_destination_configs = [aws_cloudwatch_log_group.waf.arn]
 }

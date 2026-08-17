@@ -11,7 +11,8 @@
 # sitting in a bucket. Subscribing your email means an actual
 # notification lands in your inbox when GuardDuty finds something.
 resource "aws_sns_topic" "security_alerts" {
-  name = "${var.project_name}-security-alerts"
+  name              = "${var.project_name}-security-alerts"
+  kms_master_key_id = "alias/aws/sns" # AWS-managed key, free to enable
 }
 
 resource "aws_sns_topic_subscription" "security_alerts_email" {
