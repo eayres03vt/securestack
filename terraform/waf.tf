@@ -146,6 +146,32 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
+  # Blocks requests from known anonymizing proxies/Tor exit nodes/VPNs.
+  # Paired with KnownBadInputsRuleSet above, this is AWS's recommended
+  # combination for Log4Shell-style exploitation attempts (CVE-2021-44228),
+  # which frequently originate from anonymized IPs.
+  rule {
+    name     = "aws-anonymous-ip-list"
+    priority = 4
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAnonymousIpList"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${var.project_name}-anonymous-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "${var.project_name}-waf"
