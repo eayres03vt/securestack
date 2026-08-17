@@ -8,7 +8,7 @@ A secure, monitored inventory management system, deployed on AWS with everything
 
 ## The problem this is based on
 
-At the City of Richmond, I built an inventory tracking system for supply management on SharePoint. It was functional, but manually maintained, with no infrastructure automation, no security scanning, and no detection layer if something went wrong. It worked because someone was watching it.
+At the City of Richmond, I built an inventory tracking system for supply management on SharePoint. The system itself had no infrastructure as code (everything was configured by hand through the SharePoint UI), no security scanning built into how changes were made, and no monitoring or alerting specific to it. It worked because I was the one keeping an eye on it, not because it was built to hold up without me.
 
 SecureStack rebuilds that same idea (tracking items, quantities, locations) as a production-style cloud deployment instead. Infrastructure is provisioned by code instead of clicked together by hand, every change is scanned for security issues before it ships, and a monitoring layer actually tells you if someone is doing something they shouldn't. It's the difference between a system that works because someone happens to be watching it, and one built to hold up when no one is.
 
