@@ -31,3 +31,8 @@ output "db_endpoint" {
   description = "RDS connection endpoint (host:port)"
   value       = aws_db_instance.main.endpoint
 }
+
+output "app_url" {
+  description = "The URL to actually view the app now - goes through the load balancer (and WAF, when it's deployed)"
+  value       = "http://${aws_lb.main.dns_name}"
+}

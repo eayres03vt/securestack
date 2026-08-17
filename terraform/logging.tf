@@ -130,6 +130,50 @@ resource "aws_sns_topic_policy" "cloudtrail" {
   })
 }
 
+# CloudTrail's primary copy goes to S3 (long-term, tamper-evident
+# archive). This second destination - CloudWatch Logs - is what makes
+# it actually queryable/searchable in near-real-time, which is the
+# foundation of the lightweight "SIEM" layer below.
+resource "aws_cloudwatch_log_group" "cloudtrail" {
+  name              = "/${var.project_name}/cloudtrail"
+  retention_in_days = 14
+
+  tags = {
+    Name = "${var.project_name}-cloudtrail-logs"
+  }
+}
+
+resource "aws_iam_role" "cloudtrail_to_cloudwatch" {
+  name = "${var.project_name}-cloudtrail-cwl-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "cloudtrail_to_cloudwatch" {
+  name = "${var.project_name}-cloudtrail-cwl-policy"
+  role = aws_iam_role.cloudtrail_to_cloudwatch.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+      }
+    ]
+  })
+}
+
 # ============================================================
 # CloudTrail - records every API call made in this AWS account:
 # who did it, when, from where, and what they did. This is the
@@ -145,6 +189,9 @@ resource "aws_cloudtrail" "main" {
   is_multi_region_trail         = true
   enable_log_file_validation    = true # detects if log files are tampered with
   sns_topic_name                = aws_sns_topic.cloudtrail.name
+
+  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+  cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail_to_cloudwatch.arn
 
   depends_on = [aws_s3_bucket_policy.logs, aws_sns_topic_policy.cloudtrail]
 

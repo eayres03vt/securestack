@@ -1,5 +1,10 @@
 # Security Scan Exceptions
 
+## Architecture note: SIEM approach
+
+The original plan called for a dedicated SIEM (Wazuh). In practice, Wazuh's full stack requires ~4GB+ RAM to run reliably, which exceeds free-tier eligible instance sizes (~$30-60/month to run properly-sized 24/7). Rather than either paying for that continuously or standing up something undersized and unreliable, this project instead builds equivalent core SIEM capabilities on native AWS services at effectively zero cost: CloudTrail routed to CloudWatch Logs for searchability, GuardDuty findings routed via EventBridge to both email alerting (SNS) and a searchable log group, saved CloudWatch Logs Insights queries functioning as the "triage screen," and a consolidated CloudWatch Dashboard. This trades some SIEM-specific features (correlation rules, a dedicated UI, agent-based endpoint monitoring) for cost-effectiveness appropriate to this project's scale - a tradeoff explicitly made and documented, not an oversight.
+
+
 The CI/CD pipeline runs [Checkov](https://www.checkov.io/) against the Terraform code on every push, and blocks deployment if it fails. The checks below are intentionally excluded from that gate — not ignored, but reviewed and accepted, with reasoning documented here rather than silently suppressed. Anything not listed here is enforced.
 
 ## Cost tradeoffs (free-tier scope)
