@@ -33,6 +33,12 @@ output "db_endpoint" {
 }
 
 output "app_url" {
-  description = "The URL to actually view the app now - goes through the load balancer (and WAF, when it's deployed)"
+  description = "The URL to actually view the app now - goes through the load balancer and WAF, then requires an app login"
   value       = "http://${aws_lb.main.dns_name}"
+}
+
+output "admin_password" {
+  description = "The generated admin login password - view it with: terraform output -raw admin_password (don't paste this anywhere, including chat)"
+  value       = random_password.admin_password.result
+  sensitive   = true
 }

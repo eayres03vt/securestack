@@ -2,6 +2,7 @@
 {% block content %}
 <h2>Edit Item</h2>
 <form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="field"><label>Name</label><input name="name" value="{{ item.name }}" required></div>
   <div class="field"><label>SKU</label><input name="sku" value="{{ item.sku }}" required></div>
   <div class="field"><label>Category</label><input name="category" value="{{ item.category or '' }}"></div>
